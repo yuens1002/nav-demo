@@ -1,3 +1,6 @@
+window.Event = new Vue();
+
+
 Vue.component('svg-logo', {
 	template: `
 		<svg
@@ -23,15 +26,15 @@ Vue.component('svg-navToggle', {
 	template: `
 			<transition name="fade" mode="out-in">
 				<svg
-					width="28px"
-					height="25px"
-					viewBox="186 83 28 25"
-					version="1.1"
-					xmlns="http://www.w3.org/2000/svg"
-					xmlns:xlink="http://www.w3.org/1999/xlink"
-					@click="$emit('toggleNavPanel')"
-					v-if="!nav_isVisible"
-					key="openNavPanel"
+				width="28px"
+				height="25px"
+				viewBox="186 83 28 25"
+				version="1.1"
+				xmlns="http://www.w3.org/2000/svg"
+				xmlns:xlink="http://www.w3.org/1999/xlink"
+				@click="$emit('toggleNavPanel')"
+				v-if="!nav_isVisible"
+				key="openNavPanel"
 				>
 					<desc>open site navigation panel</desc>
 					<defs></defs>
@@ -58,6 +61,97 @@ Vue.component('svg-navToggle', {
 	`
 });
 
+Vue.component('nav-div', {
+		props: ['header','isSelected'],
+		data() {
+			return {
+				isActive: '',
+			};
+		},
+		created() {
+			this.isActive = this.isSelected;
+		},
+		methods: {
+			setState() {
+				this.isActive = true;
+				this.$emit('toggleSubNavPanel');
+				Event.$emit('openSubNavPanel', this.header);
+			}
+		},
+		template: `
+			<div class="container" :class="{'container-selected': isActive}">
+				<div class="nav-panel-section">
+					<i class="fa fa-lg fa-fw" :class="header.icon"></i>
+					{{header.title}}
+				</div>
+				<div
+				class="nav-panel-section nav-panel-has-sub"
+				v-if="header.subtitle"
+				@click="setState">
+					<svg width="11px" height="14px" viewBox="278 94 14 22" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+					<desc>open</desc>
+					<defs></defs>
+					<polyline id="Line-Copy-4" stroke="#FFFFFF" stroke-width="3" stroke-linecap="square" fill="none" transform="translate(285.053479, 105.298896) rotate(-180.000000) translate(-285.053479, -105.298896) " points="289.106958 97 281 105.298896 289.106958 113.597793"></polyline>
+					</svg>
+				</div>
+			</div>
+		`
+});
+
+Vue.component('subnav-div', {
+	props: ['subtitle', 'header', 'index'],
+	data() {
+		return {
+			isVisible: false
+		};
+	},
+	computed: {
+		hasSstitle() {
+			return (this.header.subsubtitle && this.header.subsubtitle[this.index]);
+		}
+	},
+	template: `
+		<div>
+		<div class="container" :key="subtitle">
+			<div class="subnav-panel-section">{{subtitle}}</div>
+			<div class="subnav-panel-section subnav-panel-has-sub"
+			@click="isVisible=!isVisible"
+			v-if="hasSstitle"
+			>
+				<svg width="9px"
+				height="12px"
+				viewBox="278 94 14 22"
+				version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+				>
+				<desc>open</desc>
+				<defs></defs>
+				<polyline id="Line-Copy-4" stroke="#FFFFFF" stroke-width="3" stroke-linecap="square" fill="none" transform="translate(285.053479, 105.298896) rotate(-180.000000) translate(-285.053479, -105.298896) " points="289.106958 97 281 105.298896 289.106958 113.597793"></polyline>
+				</svg>
+			</div>
+		</div>
+		<div class="sub-subnav-heading"
+		v-show="isVisible"
+		v-if="hasSstitle"
+		>
+			<div class="sub-subnav-section" v-for="subsubtitle of header.subsubtitle[this.index]">{{subsubtitle}}</div>
+		</div>
+		</div>
+	`
+});
+
+Vue.component('sub-subnav-div', {
+	template: `
+
+		<div class="sub-subnav-heading" key="2346"
+		v-show="sub_subnav_isVisible"
+		:class="{'slide-enter-active':sub_subnav_isVisible}"
+		>
+			<slot></slot>
+		</div>
+		<div class="sub-subnav-section"></div>
+	`
+});
+
 Vue.component('site-nav', {
 	template: `
 		<nav>
@@ -81,14 +175,7 @@ Vue.component('site-main', {
 });
 
 Vue.component('nav-panel', {
-	props: {
-		nav_isVisible: {
-			default: false
-		}
-		//subnav_isVisible: {
-			//default: false
-		//}
-	},
+	props: ['nav_isVisible'],
 	methods: {
 		beforeEnter(el) {
 			el.style.opacity = 0;
@@ -109,31 +196,22 @@ Vue.component('nav-panel', {
 		>
 		<aside v-if='nav_isVisible' class="nav-panel">
 			<div class="nav-panel-header"><slot></slot></div>
-			<div class="container" @click="$emit('toggleSubNavPanel')">
-					<div class="nav-panel-section">
-						<i class="fa fa-calendar fa-lg fa-fw"></i>my schedule & bidding
-					</div>
-					<div class="nav-panel-section nav-panel-has-sub">
-						<svg width="11px" height="14px" viewBox="278 94 14 22" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-						<desc>open</desc>
-						<defs></defs>
-						<polyline id="Line-Copy-4" stroke="#FFFFFF" stroke-width="3" stroke-linecap="square" fill="none" transform="translate(285.053479, 105.298896) rotate(-180.000000) translate(-285.053479, -105.298896) " points="289.106958 97 281 105.298896 289.106958 113.597793"></polyline>
-						</svg>
-					</div>
-			</div>
-			<div class="container">
-					<div class="nav-panel-section">
-						<i class="fa fa-life-ring fa-lg fa-fw"></i>saftety
-					</div>
-					<div class="nav-panel-section nav-panel-has-sub"> > </div>
-			</div>
+			<slot name="headers"></slot>
 		</aside>
 		</transition>
 	`
 });
 
 Vue.component('subnav-panel', {
-		props: ['subnav_isVisible', 'sub_subnav_isVisible'],
+		props: [
+			'subnav_isVisible',
+			'sub_subnav_isVisible',
+		],
+		data() {
+			return {
+				header: {}
+			};
+		},
 		methods: {
 			beforeEnter(el) {
 				el.style.display = 'none';
@@ -148,88 +226,159 @@ Vue.component('subnav-panel', {
 				Velocity(el, {right: '-100%'}, {duration: 500}, {complete: done});
 			}
 		},
+		created() {
+		Event.$on('openSubNavPanel', (headerData) => {
+			this.header = headerData;
+		});
+		},
 		template: `
-		<aside class="subnav-panel" v-if="subnav_isVisible">
-			<transition-group
+<!--
+		<transition
 				@before-leave="beforeLeave"
 				@before-enter="beforeEnter"
 				@enter="enter"
 				@leave="leave"
 				:css="false"
 			>
-			<div class="container subnav-panel-header" key="123">
-				<div>saftey</div>
+-->
+		<aside class="subnav-panel" v-if="subnav_isVisible">
+			<div class="container subnav-panel-header" :key="header.title">
+				<div>{{header.title}}</div>
 				<div @click="$emit('toggleSubNavPanel')">
-					<svg width="13px"
-						height="13px"
-						viewBox="232 102 22 22"
-						version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-						>
-							<desc>close saftey navigation</desc>
-							<defs></defs>
-							<path d="M235,105 L250.587909,121.597793" id="Line" stroke="#FFFFFF" stroke-width="3" stroke-linecap="square" fill="none"></path>
-							<path d="M250.9221,105 L235,121.263456" id="Line-Copy" stroke="#FFFFFF" stroke-width="3" stroke-linecap="square" fill="none"></path>
-					</svg>
-				</div>
-			</div>
-			<div class="container" key="124">
-				<div class="subnav-panel-section">reporting</div>
-				<div class="subnav-panel-section
-				subnav-panel-has-sub"
-				@click="$emit('toggleSubSubNavPanel')"
-				>
-					<svg width="9px"
-					height="12px"
-					viewBox="278 94 14 22"
-					version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+					<svg
+					width="13px"
+					height="13px"
+					viewBox="232 102 22 22"
+					version="1.1" xmlns="http://www.w3.org/2000/svg"
+					xmlns:xlink="http://www.w3.org/1999/xlink"
 					>
-    			<desc>open</desc>
-    			<defs></defs>
-    			<polyline id="Line-Copy-4" stroke="#FFFFFF" stroke-width="3" stroke-linecap="square" fill="none" transform="translate(285.053479, 105.298896) rotate(-180.000000) translate(-285.053479, -105.298896) " points="289.106958 97 281 105.298896 289.106958 113.597793"></polyline>
+						<desc>close saftey navigation</desc>
+						<defs></defs>
+						<path d="M235,105 L250.587909,121.597793" id="Line" stroke="#FFFFFF" stroke-width="3" stroke-linecap="square" fill="none"></path>
+						<path d="M250.9221,105 L235,121.263456" id="Line-Copy" stroke="#FFFFFF" stroke-width="3" stroke-linecap="square" fill="none"></path>
 					</svg>
 				</div>
 			</div>
-			<div class="sub-subnav-heading slide-enter" key="2346"
-				v-show="sub_subnav_isVisible"
-				:class="{'slide-enter-active':sub_subnav_isVisible}"
-				>
-					<div class="sub-subnav-section">I-21 injury reporting</div>
-					<div class="sub-subnav-section">ASAP Reporting</div>
-					<div class="sub-subnav-section">General ASAP Information</div>
-					<div class="sub-subnav-section">Fight Attendant Incident Report</div>
-			</div>
-			<div class="container" key="125">
-				<div class="subnav-panel-section">Agriculture and Customs</div>
-				<div class="subnav-panel-section subnav-panel-has-sub">
-					<svg width="9px" height="12px" viewBox="278 94 14 22" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    			<desc>open</desc>
-    			<defs></defs>
-    			<polyline id="Line-Copy-4" stroke="#FFFFFF" stroke-width="3" stroke-linecap="square" fill="none" transform="translate(285.053479, 105.298896) rotate(-180.000000) translate(-285.053479, -105.298896) " points="289.106958 97 281 105.298896 289.106958 113.597793"></polyline>
-						</svg>
-					</div>
-			</div>
-			<div class="container" key="13289">
-				<div class="subnav-panel-section">Known Crewmember</div>
-			</div>
-			</transition-group>
+			<subnav-div v-for="(subtitle, i) of header.subtitle" :subtitle="subtitle" :header=header :index="i"></subnav-div>
 		</aside>
+<!--		</transition>-->
 	`
 });
 
-Vue.component('sub-subnav-panel',{
-	template: `
-		<aside class="sub-subnav-panel">
-			<div><slot></slot></div>
-		</aside>
-	`
-});
+
 
 new Vue({
 	el: '#root',
 	data: {
 		nav_isVisible: false,
 		subnav_isVisible: false,
-		sub_subnav_isVisible: false
+		sub_subnav_isVisible: false,
+		sub_subnav_isVisible: false,
+		sub_subnav_isVisible: false,
+		nav_title: 'Hello Donovan Beck',
+		nav_subheader: 'Section > Page Title',
+		text: 'Fidelissimae sint veniam singulis o varias litteris nulla ubi quis nam nostrud quamquam fugiat e lorem quem domesticarum eram concursionibus varias lorem eu legam aliqua.',
+		isSelected: false,
+		nav_header: [
+			{
+				title: 'my schedule & bidding',
+				icon: 'fa-calendar',
+				subtitle: [
+					'non elit',
+					'et iudicem aliqua',
+					'expetendis doctrina'
+				]
+			},
+			{
+				title: 'safety',
+				icon: 'fa-life-ring',
+				subtitle: [
+					'reporting',
+					'agriculture & Customs',
+					'known crewmember',
+					'product safety data search'
+				],
+				subsubtitle: [
+					[
+						'i-21 injury reporting',
+						'ASAP reporting',
+						'general ASAP information',
+						'flight attendant incident report'
+					],
+					[
+						'enim cillum elit',
+						'labore vidisse',
+						'transferrem multos offendit'
+					],
+					'',
+					''
+				]
+			},
+			{
+				title: 'training',
+				icon: 'fa-plane'
+			},
+			{
+				title: 'administration',
+				icon: 'fa-university',
+				subtitle: [
+					'OJI & leaves',
+					'pay & benefits',
+					'performance',
+					'inflight resource directory',
+					'mobile & web',
+					'AFA'
+				],
+				subsubtitle: [
+					[
+						'eiusmod duis',
+						'laborum ex',
+						'eruditionem officia'
+					],
+					[
+						'eiusmod duis',
+						'laborum ex',
+						'eruditionem officia'
+					],
+					[
+						'eiusmod duis',
+						'laborum ex',
+						'eruditionem officia'
+					],
+					'',
+					[
+						'eiusmod duis',
+						'laborum ex',
+						'eruditionem officia'
+					]
+				]
+			},
+			{
+				title: 'catering & brand',
+				icon: 'fa-globe',
+				subtitle: [
+					'eiusmod fugiat',
+					'proident eiusmod',
+					'tempor firmissimum'
+				]
+			},
+			{
+				title: 'hotels',
+				icon: 'fa-bed'
+			},
+			{
+				title: 'my base',
+				icon: 'fa-map-marker'
+			},
+			{
+				title: 'regognition',
+				icon: 'fa-trophy'
+			},
+			{
+				title: 'my leadership team',
+				icon: 'fa-users'
+			}
+		]
 	},
 	methods: {
 		toggleAllPanels() {
@@ -248,19 +397,26 @@ new Vue({
 					>
 					</svg-navToggle>
 				</div>
-				<p>Section > Page Title</p>
+				<p>{{nav_subheader}}</p>
 			</site-nav>
-			<nav-panel
-				:nav_isVisible="nav_isVisible"
-				@toggleSubNavPanel="subnav_isVisible=!subnav_isVisible">
-					Hello Donovan Beck
+			<nav-panel :nav_isVisible="nav_isVisible">
+				{{nav_title}}
+				<div slot="headers">
+					<nav-div
+					v-for="header of nav_header"
+					:header="header"
+					:isSelected="isSelected"
+					@toggleSubNavPanel="subnav_isVisible=!subnav_isVisible"
+					>
+					</nav-div>
+				</div>
 			</nav-panel>
 			<subnav-panel
 			:subnav_isVisible="subnav_isVisible" @toggleSubNavPanel="subnav_isVisible=!subnav_isVisible"
 			:sub_subnav_isVisible="sub_subnav_isVisible"
 			@toggleSubSubNavPanel="sub_subnav_isVisible=!sub_subnav_isVisible"
 			>safety</subnav-panel>
-			<site-main>asdfadf</site-main>
+			<site-main>{{text}}</site-main>
 		</div>
 	`
 });

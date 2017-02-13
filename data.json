@@ -1,0 +1,104 @@
+nav_header: [
+	{
+		title: 'my schedule & bidding',
+		icon: 'fa-calendar',
+		subnav: true,
+	},
+	{
+		title: 'safety',
+		icon: 'fa-life-ring',
+		subnav: true
+	},
+	{
+		title: 'training',
+		icon: 'fa-plane',
+		subnav: false
+	},
+	{
+		title: 'administration',
+		icon: 'fa-university',
+		subnav: true
+	},
+	{
+		title: 'catering & brand',,
+		icon: 'fa-globe',
+		subnav: true
+	},
+	{
+		title: 'hotels',
+		icon: 'fa-bed',
+		subnav: false
+	},
+	{
+		title: 'my base',
+		icon: 'fa-map-marker',
+		subnav: false
+	},
+	{
+		title: 'regognition',
+		icon: 'fa-trophy',
+		subnav: false
+	},
+	{
+		title: 'my leadership team',
+		icon: 'fa-users',
+		subnav: false
+	}
+],
+
+headers: [
+			'my schedue & bidding', [
+				'non elit',
+				'et iudicem aliqua',
+				'expetendis doctrina'
+			],
+			'safety', [
+				'reporting', [
+					'i-21 injury reporting',
+					'ASAP reporting',
+					'general ASAP information',
+					'flight attendant incident report'
+				],
+				'agriculture and customs', [
+						'enim cillum elit',
+						'labore vidisse',
+						'transferrem multos offendit'
+					],
+				'known crewmember',
+				'product saftety data search'
+			],
+			'training',
+			'administration', [
+				'OJI and leaves', [
+					'eiusmod duis',
+					'laborum ex',
+					'eruditionem officia'
+				],
+				'pay & benefits', [
+					'eiusmod duis',
+					'laborum ex',
+					'eruditionem officia'
+				],
+				'performance', [
+					'eiusmod duis',
+					'laborum ex',
+					'eruditionem officia'
+				],
+				'inflight resource directory',
+				'mobile and web', [
+					'eiusmod duis',
+					'laborum ex',
+					'eruditionem officia'
+				],
+				'AFA'
+			],
+			'catering & brand', [
+				'eiusmod fugiat',
+				'proident eiusmod',
+				'tempor firmissimum'
+			],
+			'hotels',
+			'my base',
+			'regognition',
+			'my leadership team'
+		]
