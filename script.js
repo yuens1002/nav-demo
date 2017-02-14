@@ -1,5 +1,29 @@
 window.Event = new Vue();
-
+//rotate(-90.000000)
+var SVGarrow = {
+	props: ['SVGspecs', 'rotation'],
+	data() {
+		return {
+			trans1: '',
+			trans2: ''
+		};
+	},
+	template: `
+		<svg width="9px"
+				height="12px"
+				viewBox="278 94 14 22"
+				version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+				>
+				<desc>open</desc>
+				<defs></defs>
+				<polyline :transform="[trans1, rotation, trans2]"id="Line-Copy-4" stroke="#FFFFFF" stroke-width="3" stroke-linecap="square" fill="none" points="289.106958 97 281 105.298896 289.106958 113.597793"></polyline>
+		</svg>
+	`,
+	created() {
+		this.trans1 = this.SVGspecs.trans1;
+		this.trans2 = this.SVGspecs.trans2;
+	}
+}
 
 Vue.component('svg-logo', {
 	template: `
@@ -118,7 +142,12 @@ Vue.component('subnav-div', {
 	props: ['subtitle', 'header', 'index'],
 	data() {
 		return {
-			isVisible: false
+			isVisible: false,
+			SVGspecs: {
+				trans1: 'translate(285.053479, 105.298896)',
+				trans2: 'translate(-285.053479, -105.298896)'
+			},
+			rotation: 'rotate(-180.000000)'
 		};
 	},
 	computed: {
@@ -126,34 +155,44 @@ Vue.component('subnav-div', {
 			return (this.header.subsubtitle && this.header.subsubtitle[this.index]);
 		}
 	},
+	methods: {
+		setState() {
+			this.isVisible = !this.isVisible;
+			if (this.isVisible) {
+				this.rotation = 'rotate(-90.000000)'
+			} else {
+				this.rotation = 'rotate(-180.000000)'
+			}
+		}
+	},
+	components: {
+		'svgArw' : SVGarrow
+	},
 	template: `
 		<div>
 		<div class="container" :key="subtitle">
 			<div class="subnav-panel-section">{{subtitle}}</div>
 			<div class="subnav-panel-section subnav-panel-has-sub"
-			@click="isVisible=!isVisible"
+			@click="setState"
 			v-if="hasSstitle"
 			>
-				<svg width="9px"
-				height="12px"
-				viewBox="278 94 14 22"
-				version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-				>
-				<desc>open</desc>
-				<defs></defs>
-				<polyline id="Line-Copy-4" stroke="#FFFFFF" stroke-width="3" stroke-linecap="square" fill="none" transform="translate(285.053479, 105.298896) rotate(-180.000000) translate(-285.053479, -105.298896) " points="289.106958 97 281 105.298896 289.106958 113.597793"></polyline>
-				</svg>
+				<svgArw :SVGspecs="SVGspecs" :rotation="rotation"></svgArw>
 			</div>
 		</div>
+		<transition name="list">
 		<div class="sub-subnav-heading"
 		v-show="isVisible"
 		v-if="hasSstitle"
 		>
-			<div class="sub-subnav-section"
-			v-for="subsubtitle of header.subsubtitle[this.index]">
+			<div
+			class="sub-subnav-section"
+			v-for="subsubtitle of header.subsubtitle[this.index]"
+			:key="subsubtitle"
+			>
 				{{subsubtitle}}
 			</div>
 		</div>
+		</transform>
 		</div>
 	`
 });
