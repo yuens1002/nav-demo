@@ -10,7 +10,7 @@ Vue.component('svg-logo', {
 		xmlns="http://www.w3.org/2000/svg"
 		xmlns:xlink="http://www.w3.org/1999/xlink"
 		>
-			<desc>site wide company logo</desc>
+			<desc>company logo</desc>
 			<defs></defs>
 			<text id="Alasca" stroke="none" fill="none" font-family="AvenirNext-DemiBoldItalic, Avenir Next" font-size="48" font-style="italic" font-weight="500">
 				<tspan x="127.763709" y="68" fill="#F3F8F7">Alasca</tspan>
@@ -66,20 +66,35 @@ Vue.component('nav-div', {
 		data() {
 			return {
 				isActive: '',
+				isDelect: false,
+				isTurned: false
 			};
 		},
 		created() {
 			this.isActive = this.isSelected;
+			Event.$on('subNavClosed', () => {
+			this.isActive = false;
+			this.isDelect = false;
+		});
 		},
 		methods: {
 			setState() {
 				this.isActive = true;
 				this.$emit('toggleSubNavPanel');
 				Event.$emit('openSubNavPanel', this.header);
+				this.isTurned = !this.isTurned;
+			}
+		},
+		computed: {
+			styles() {
+				return {
+					'container-selected': this.isActive,
+					'container-deselect': this.isDelect
+				};
 			}
 		},
 		template: `
-			<div class="container" :class="{'container-selected': isActive}">
+			<div class="container" :class="styles">
 				<div class="nav-panel-section">
 					<i class="fa fa-lg fa-fw" :class="header.icon"></i>
 					{{header.title}}
@@ -88,7 +103,8 @@ Vue.component('nav-div', {
 				class="nav-panel-section nav-panel-has-sub"
 				v-if="header.subtitle"
 				@click="setState">
-					<svg width="11px" height="14px" viewBox="278 94 14 22" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+					<svg width="11px" height="14px" viewBox="278 94 14 22" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+					:class="{'turn90deg':isTurned}">
 					<desc>open</desc>
 					<defs></defs>
 					<polyline id="Line-Copy-4" stroke="#FFFFFF" stroke-width="3" stroke-linecap="square" fill="none" transform="translate(285.053479, 105.298896) rotate(-180.000000) translate(-285.053479, -105.298896) " points="289.106958 97 281 105.298896 289.106958 113.597793"></polyline>
@@ -133,22 +149,12 @@ Vue.component('subnav-div', {
 		v-show="isVisible"
 		v-if="hasSstitle"
 		>
-			<div class="sub-subnav-section" v-for="subsubtitle of header.subsubtitle[this.index]">{{subsubtitle}}</div>
+			<div class="sub-subnav-section"
+			v-for="subsubtitle of header.subsubtitle[this.index]">
+				{{subsubtitle}}
+			</div>
 		</div>
 		</div>
-	`
-});
-
-Vue.component('sub-subnav-div', {
-	template: `
-
-		<div class="sub-subnav-heading" key="2346"
-		v-show="sub_subnav_isVisible"
-		:class="{'slide-enter-active':sub_subnav_isVisible}"
-		>
-			<slot></slot>
-		</div>
-		<div class="sub-subnav-section"></div>
 	`
 });
 
@@ -176,6 +182,11 @@ Vue.component('site-main', {
 
 Vue.component('nav-panel', {
 	props: ['nav_isVisible'],
+	data() {
+		return {
+			headers: []
+		};
+	},
 	methods: {
 		beforeEnter(el) {
 			el.style.opacity = 0;
@@ -185,7 +196,20 @@ Vue.component('nav-panel', {
 		},
 		leave(el, done) {
 			Velocity(el, {left: '-100%'}, {duration: 300}, {complete: done});
+		},
+		deSelect(data) {
+			this.headers.forEach((node) => {
+				node.isDelect = (node.header.title !== data.title);
+			});
 		}
+	},
+	created() {
+			Event.$on('openSubNavPanel', (data) => {
+				this.deSelect(data);
+			});
+	},
+	mounted() {
+			this.headers = this.$children;
 	},
 	template: `
 		<transition
@@ -209,42 +233,46 @@ Vue.component('subnav-panel', {
 		],
 		data() {
 			return {
-				header: {}
+				header: {},
 			};
 		},
 		methods: {
 			beforeEnter(el) {
-				el.style.display = 'none';
+				//el.style.display = 'none';
 			},
 			beforeLeave(el) {
-				el.style.display = 'none';
+//				el.style.display = 'none';
 			},
 			enter(el, done) {
-				Velocity(el, {right: 47}, {duration: 500}, {complete: done});
+				Velocity(el, {left: '47px'}, {duration: 300}, {complete: done});
 			},
 			leave(el, done) {
-				Velocity(el, {right: '-100%'}, {duration: 500}, {complete: done});
+				Velocity(el, {left: '100%'}, {duration: 300}, {complete: done});
+			},
+			emitState() {
+				this.$emit('toggleSubNavPanel');
+				Event.$emit('subNavClosed');
 			}
 		},
 		created() {
-		Event.$on('openSubNavPanel', (headerData) => {
-			this.header = headerData;
-		});
+			Event.$on('openSubNavPanel', (headerData) => {
+				console.log(headerData);
+				console.log('from subnav');
+				this.header = headerData;
+			});
 		},
 		template: `
-<!--
+
 		<transition
-				@before-leave="beforeLeave"
-				@before-enter="beforeEnter"
-				@enter="enter"
-				@leave="leave"
-				:css="false"
+			@enter="enter"
+			@before-leave="beforeLeave"
+			@before-enter="beforeEnter"
+			@leave="leave"
 			>
--->
 		<aside class="subnav-panel" v-if="subnav_isVisible">
-			<div class="container subnav-panel-header" :key="header.title">
+			<div class="container subnav-panel-header" :key="header.title" :class="{'subnav-panel-enter':subnav_isVisible}">
 				<div>{{header.title}}</div>
-				<div @click="$emit('toggleSubNavPanel')">
+				<div @click="emitState">
 					<svg
 					width="13px"
 					height="13px"
@@ -252,7 +280,7 @@ Vue.component('subnav-panel', {
 					version="1.1" xmlns="http://www.w3.org/2000/svg"
 					xmlns:xlink="http://www.w3.org/1999/xlink"
 					>
-						<desc>close saftey navigation</desc>
+						<desc>close {{header.title}}</desc>
 						<defs></defs>
 						<path d="M235,105 L250.587909,121.597793" id="Line" stroke="#FFFFFF" stroke-width="3" stroke-linecap="square" fill="none"></path>
 						<path d="M250.9221,105 L235,121.263456" id="Line-Copy" stroke="#FFFFFF" stroke-width="3" stroke-linecap="square" fill="none"></path>
@@ -261,7 +289,7 @@ Vue.component('subnav-panel', {
 			</div>
 			<subnav-div v-for="(subtitle, i) of header.subtitle" :subtitle="subtitle" :header=header :index="i"></subnav-div>
 		</aside>
-<!--		</transition>-->
+		</transition>
 	`
 });
 

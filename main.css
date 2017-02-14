@@ -1,34 +1,3 @@
-
-
-/*
-		.slide-enter {
-			top: 0;
-		}
-		.slide-leave-active,
-		.slide-enter-active {
-			transform: translateY(0);
-  		transition: .4s ease-in-out;
-		}
-		.side-leave-to {
-			transform: translateY(-100%);
-
-		}
-*/
-
-		.fade-enter-active {
-			transition: opacity .3s;
-		}
-		.fade-enter {
-			opacity: 0;
-		}
-		.fade-leave-active {
-			transition: all .3s;
-		}
-		.fade-leave-to {
-			transform: rotate(360deg);
-			opacity: 0;
-		}
-
 		* {
 			padding: 0;
 			margin: 0;
@@ -39,6 +8,7 @@
 		textarea {
 				font: 100%/1.5 'Noto Sans', sans-serif;
     		color: #555;
+			overflow: hidden;
 
 		}
 		ul, li {
@@ -56,15 +26,25 @@
 		.no-border {
 			border: none;
 		}
+		.turn90deg {
+			transform: rotate(90deg) .4s ease;
+		}
 		.container-selected {
 			background: white;
 			color: #004664;
+			transition: all .6s ease;
+		}
+		.container-deselect {
+			background: #004664;
+			color: #297AA9;
+			transition: all .6s ease;
 		}
 		.container {
 			display: flex;
 			flex-wrap: nowrap;
 			justify-content: space-between;
 			align-items: center;
+			transition: all .6s ease;
 		}
 		.site-nav, .nav-breadcrumb, section {
 			padding: .5rem 1rem;
@@ -85,7 +65,7 @@
 			box-sizing: border-box;
 			color: white;
 			font-size: .85rem;
-			overflow: hidden;
+			display: table;
 		}
 		.nav-panel {
 			background-image: url('sky.png');
@@ -115,21 +95,18 @@
 			text-align: center;
 			flex: none;
 		}
-/*
-		.nav-panel .container:hover {
-			background-color: rgba(255, 255, 255, .4);
-			cursor: pointer;
-		}
-*/
+
 		.subnav-panel {
+			overflow: hidden;
 			z-index: 2000;
-			right: 0;
+			left: 100%;
 			top: 153px;
 			border-left: 2px rgba(255, 255, 255, .3) solid;
 			width: calc(100% - 47px);
 			height: 100vh;
 			height: calc(100vh - 153px);
 		}
+
 		.subnav-panel-header {
 			padding: 1.23rem 1rem;
 			text-transform: uppercase;
